@@ -42,6 +42,9 @@ void setup() {
   ping();
   pixels.begin();
   pinMode(ButtonPin, INPUT);
+  pinMode(MotorButton, INPUT);
+  pinMode(Motor1, OUTPUT);
+  pinMode(Motor2, OUTPUT);
 
   for (int i = 0; i < NUMPIXELS; i++) {
     pixels.setPixelColor(i, pixels.Color(0, 255, 0));
@@ -55,10 +58,23 @@ void setup() {
 
 void loop() {
   handleButtonPress();
+  motorControl();
   if (!secondLayerActive && waitingForPress) {
     blinkCurrentLight();
   } else if (secondLayerActive) {
     displayWeight();
+  }
+}
+
+void motorControl(){
+  int buttonValue = digitalRead(MotorButton); 
+  if (buttonValue = LOW) {
+    digitalWrite(motor1, HIGH);
+    digitalWrite(motor2, LOW);
+    delay(100);
+    digitalWrite(motor1, LOW);
+    digitalWrite(motor2, HIGH);
+    delay(100);
   }
 }
 
