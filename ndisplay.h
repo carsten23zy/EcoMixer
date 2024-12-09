@@ -1,3 +1,4 @@
+// From https://arduino.stackexchange.com/questions/51092/6-wire-3-digits-7-segment-display-and-arduino-question, modified slightly
 #ifndef NDISPLAY_H
 #define NDISPLAY_H
 

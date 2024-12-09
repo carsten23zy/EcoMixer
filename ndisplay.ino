@@ -1,3 +1,5 @@
+// Approach from https://arduino.stackexchange.com/questions/51092/6-wire-3-digits-7-segment-display-and-arduino-question
+// Code generally the same, changed values to fit our 7 segment display
 #include "ndisplay.h"
 
 #define p2 1

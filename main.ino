@@ -1,15 +1,16 @@
 //Code by CZ, AI generated sections marked with comment
+//Github copilot and chatGPT used to debug multiple times
 #include "findWeights.h"
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <Wire.h>
 #include <vector>
 
+#define NUMPIXELS 4
 #define COLOR_SENSOR_ADDR 0x48
 #define I2C_SDA 11
 #define I2C_SCL 12
 
-#define NUMPIXELS 4
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, 13, NEO_GRB + NEO_KHZ800);
 
 struct RGB {
@@ -19,9 +20,10 @@ struct RGB {
 const int ButtonPin = 14;
 const int Motor1 = 10;
 const int Motor2 = 9;
-const int MotorButton = 46;
+const int MotorButton = 8;
 
 int lastButtonValue = HIGH;
+int lastMotorValue = HIGH;
 
 volatile float recv_value[3];
 RGB colors[NUMPIXELS];
@@ -38,6 +40,7 @@ float weights[3];
 void setup() {
   delay(1000);
   Serial.begin(115200);
+  Serial.println("0");
   Wire.begin(I2C_SDA, I2C_SCL);
   ping();
   pixels.begin();
@@ -45,15 +48,17 @@ void setup() {
   pinMode(MotorButton, INPUT);
   pinMode(Motor1, OUTPUT);
   pinMode(Motor2, OUTPUT);
-
+  Serial.println("1");
   for (int i = 0; i < NUMPIXELS; i++) {
     pixels.setPixelColor(i, pixels.Color(0, 255, 0));
     pixels.show();
     delay(200);
   }
+  Serial.println("2");
   delay(500);
   pixels.clear();
   pixels.show();
+  Serial.println("3");
 }
 
 void loop() {
@@ -68,14 +73,20 @@ void loop() {
 
 void motorControl(){
   int buttonValue = digitalRead(MotorButton); 
-  if (buttonValue = LOW) {
-    digitalWrite(motor1, HIGH);
-    digitalWrite(motor2, LOW);
-    delay(100);
-    digitalWrite(motor1, LOW);
-    digitalWrite(motor2, HIGH);
-    delay(100);
+  if (buttonValue == LOW && lastMotorValue == HIGH) {
+    Serial.println("Move");
+    digitalWrite(Motor1, HIGH);
+    digitalWrite(Motor2, LOW);
+    delay(1000);
+    digitalWrite(Motor1, LOW);
+    digitalWrite(Motor2, HIGH);
+    delay(1000);
+    digitalWrite(Motor1, LOW);
+    digitalWrite(Motor2, LOW);
   }
+
+  lastMotorValue = buttonValue;
+
 }
 
 void ping(void) {
@@ -126,7 +137,9 @@ void displayWeight() {
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
 
-    if (weights[0]>=0 || weights[1]>=0 || weights[2]>=0){
+    if (weights[0]>= -0.2 && weights[1]>= -0.2 && weights[2]>= -0.2 &&
+      weights[0]<= 1.2 && weights[1]<= 1.2 && weights[2]<= 1.2 
+    ){
       firstDigit();
       dot_1();
       int scaledValue = (int)(weights[currentLight] * 100);
@@ -151,7 +164,6 @@ void handleButtonPress() {
     if (lastButtonValue == HIGH) {
       buttonPressStart = millis();
     }
-    // Check if it's a long press
     if (millis() - buttonPressStart > 1000) {
       isLongPress = true;
     }
